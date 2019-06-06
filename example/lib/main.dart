@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yui_flutter/theme/index.dart';
-import 'package:yui_flutter_example/UnderScreen.dart';
+import 'package:yui_flutter_example/Home.dart';
 import 'package:yui_flutter/yui.dart';
 
 void main() => runApp(
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      home: UnderScreen(),
+      home: HomePage(),
     );
   }
 }
