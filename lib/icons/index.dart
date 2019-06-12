@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 class YuiIcons {
 
     YuiIcons._();
+static const IconData jiantou2 = const IconData( 0xe604, fontFamily: fontFamily, fontPackage: fontPackage);
 static const IconData jiazai = const IconData( 0xe801, fontFamily: fontFamily, fontPackage: fontPackage);
 static const IconData shibai = const IconData( 0xe658, fontFamily: fontFamily, fontPackage: fontPackage);
 static const IconData wancheng = const IconData( 0xe622, fontFamily: fontFamily, fontPackage: fontPackage);
