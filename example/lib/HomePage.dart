@@ -24,6 +24,8 @@ class HomePage extends BasefulWidgetState<Home>{
     print('onCreate');
     initData();
     setAppBarTitle("首页");
+//    setTopBarVisible(false);
+//    setAppBarVisible(false);
   }
 
   @override

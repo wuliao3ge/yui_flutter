@@ -11,14 +11,15 @@ abstract class BaseFuntion {
   bool _isTopBarShow = true; //状态栏是否显示
   bool _isAppBarShow = true; //导航栏是否显示
 
-  bool _isErrorWidgetShow = false; //错误信息是否显示
 
+  bool _isErrorWidgetShow = false; //错误信息是否显示
+  Color _gradientStart ;
+  Color _gradientEnd ;
   Color _topBarColor = Color(0xFF1a90db);
   Color _appBarColor = Color(0xFF1a90db);
-  Color _appBarTextColor = Colors.white;
+  List<Widget> _appBarActions;
 
   //标题字体大小
-  double _appBarCenterTextSize = 20; //根据需求变更
   String _appBarTitle;
 
 
@@ -43,7 +44,6 @@ abstract class BaseFuntion {
 
   FontWeight _fontWidget = FontWeight.w600; //错误页面和空页面的字体粗度
 
-  double bottomVsrtical = 0; //作为内部页面距离底部的高度
 
   void initBaseCommon(State state, BuildContext context) {
     _stateBaseFunction = state;
@@ -93,30 +93,46 @@ abstract class BaseFuntion {
   }
 
   Widget _getBaseAppBar() {
-    return Offstage(
-      offstage: !_isAppBarShow,
-//      child: getAppBar(),
-      child:GradientAppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-//        gradientStart: Color(0xFF2171F5),
-//        gradientEnd: Color(0xFF49A2FC),
-        backgroundColor: _appBarColor,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.print),
-            onPressed: (){},
-          )
-        ],
-        title: Text(_appBarTitle),
-        centerTitle: true,
-        leading: IconButton(
+    if(_isTopBarShow && _isAppBarShow == false) { //如果隐藏标题不隐藏状态栏返回状态栏
+        return Container(
+          height: getTopBarHeight(),
+          width: double.infinity,
+          color: _topBarColor,
+        );
+    }else if(_isTopBarShow == false && _isAppBarShow == false){ //如果标题和状态栏都隐藏返回空 用
+          return Container();
+    }else {
+     return GradientAppBar(
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          gradientStart: Color(0xFF2171F5),  //渐变使用开始颜色
+          gradientEnd: Color(0xFF49A2FC),   //渐变使用结束颜色
+          backgroundColor: _appBarColor,
+          actions:_appBarActions,
+          title: Text(_appBarTitle),
+          centerTitle: true,
+          leading: IconButton(
             icon: Icon(YuiIcons.jiantou2),
             onPressed: clickAppBarBack,
-        ),
-      ),
+          ),
+      );
+    }
+  }
+
+  // 返回每个隐藏的菜单项
+  SelectView(IconData icon, String text, String id) {
+    return new PopupMenuItem<String>(
+        value: id,
+        child: new Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            new Icon(icon, color: Colors.blue),
+            new Text(text),
+          ],
+        )
     );
   }
+
 
   ///设置状态栏，可以自行重写拓展成其他的任何形式
   Widget getTopBar() {
@@ -235,18 +251,6 @@ abstract class BaseFuntion {
 //
 //
 
-  ///返回中间可绘制区域，也就是 我们子类 buildWidget 可利用的空间高度
-  double getMainWidgetHeight() {
-    double screenHeight = getScreenHeight() - bottomVsrtical;
-    if (_isTopBarShow) {
-      screenHeight = screenHeight - getTopBarHeight();
-    }
-    if (_isAppBarShow) {
-      screenHeight = screenHeight - getAppBarHeight();
-    }
-    return screenHeight;
-  }
-
   ///返回屏幕高度
   double getScreenHeight() {
     return MediaQuery.of(_contextBaseFunction).size.height;
@@ -261,8 +265,6 @@ abstract class BaseFuntion {
   double getAppBarHeight() {
     return kToolbarHeight;
   }
-
-
 
   //返回需要删减的高度（viewpage中使用时需要调整）
   num getCutdownHeight() {
@@ -350,26 +352,6 @@ abstract class BaseFuntion {
     });
   }
 
-
-
-  ///默认这个状态栏下，设置颜色
-  void setTopBarBackColor(Color color) {
-    // ignore: invalid_use_of_protected_member
-    _stateBaseFunction.setState(() {
-      _topBarColor = color == null ? _topBarColor : color;
-    });
-  }
-
-  ///设置导航栏的字体以及图标颜色
-  void setAppBarContentColor(Color contentColor) {
-    if (contentColor != null) {
-      // ignore: invalid_use_of_protected_member
-      _stateBaseFunction.setState(() {
-        _appBarTextColor = contentColor;
-      });
-    }
-  }
-
   ///设置导航栏隐藏或者显示
   void setAppBarVisible(bool isVisible) {
     // ignore: invalid_use_of_protected_member
@@ -378,13 +360,6 @@ abstract class BaseFuntion {
     });
   }
 
-  ///默认这个导航栏下，设置颜色
-  void setAppBarBackColor(Color color) {
-    // ignore: invalid_use_of_protected_member
-    _stateBaseFunction.setState(() {
-      _appBarColor = color == null ? _appBarColor : color;
-    });
-  }
   void setAppBarTitle(String title) {
     if (title != null) {
       // ignore: invalid_use_of_protected_member
