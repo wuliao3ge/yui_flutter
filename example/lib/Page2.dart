@@ -1,5 +1,9 @@
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/material.dart';
+import 'package:provide/provide.dart';
+import 'package:yui_flutter/button/index.dart';
+import 'package:yui_flutter/theme/index.dart';
+import 'package:yui_flutter/toast/index.dart';
 
 import 'base/BasefulWidget.dart';
 
@@ -17,8 +21,25 @@ class Page2State extends BasefulWidgetState<Page2>{
   @override
   Widget buildWidget(BuildContext context) {
     // TODO: implement build
-    return Container(
-      child: Text('123456'),
+    return Column(
+      children: <Widget>[
+        Container(height: 100,),
+        FlatButton(
+          color: Colors.red,
+          child:Text('测试'),
+
+        ),
+
+        YuiButton(
+          '按钮',
+          disabled: true,
+          onClick: (){
+            Provide.value<YuiTheme>(context).$setPrimaryColr(Colors.red);
+            YuiToast.info(context)('测试');
+          },
+//              loading: isLoading,
+        ),
+      ],
     );
   }
 

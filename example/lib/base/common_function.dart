@@ -6,53 +6,42 @@ import 'package:yui_flutter/yui.dart';
 /// base 类 常用的一些工具类 ， 放在这里就可以了
 abstract class BaseFuntion {
   State _stateBaseFunction;
-  BuildContext _contextBaseFunction;
+  BuildContext _baseContext;
 
   bool _isTopBarShow = true; //状态栏是否显示
   bool _isAppBarShow = true; //导航栏是否显示
+  Color _gradientStart ; //标题栏开始颜色
+  Color _gradientEnd ; //标题栏结束颜色
+  List<Widget> _appBarActions; //标题栏右侧按钮
+  Widget _leading; //标题栏左侧控件
+  bool _isBackIconShow = true; //是否显示返回键
+  dynamic _title; //标题栏中间控件
 
 
-  bool _isErrorWidgetShow = false; //错误信息是否显示
-  Color _gradientStart ;
-  Color _gradientEnd ;
-  Color _topBarColor = Color(0xFF1a90db);
-  Color _appBarColor = Color(0xFF1a90db);
-  List<Widget> _appBarActions;
-
-  //标题字体大小
-  String _appBarTitle;
 
 
   String _errorContentMesage = "网络错误啦~~~";
-
   String _errImgPath = "assets/images/load_error_view.png";
-
   bool _isLoadingWidgetShow = false;
   //加载中请稍后......
   String _LoadingWidgetContent = "";
-
   Color _LoadingWidgetColor = Color(0xFF000000);
   double _LoadingWidgetTextSize = 15.0;
   FontWeight _LoadingWidgetTextFontWeight = FontWeight.w600;
-
   bool _isEmptyWidgetVisible = false;
-
   String _emptyWidgetContent = "暂无数据~";
-
   String _emptyImgPath = "assets/images/ic_empty.png"; //自己根据需求变更
-  bool _isBackIconShow = true;
-
   FontWeight _fontWidget = FontWeight.w600; //错误页面和空页面的字体粗度
+  bool _isErrorWidgetShow = false; //错误信息是否显示
 
 
   void initBaseCommon(State state, BuildContext context) {
     _stateBaseFunction = state;
-    _contextBaseFunction = context;
-    _appBarTitle = getClassName();
+    _baseContext = context;
   }
 
   BuildContext getBuidContext(){
-    return _contextBaseFunction;
+    return _baseContext;
   }
 
   //主体页面渲染
@@ -60,88 +49,79 @@ abstract class BaseFuntion {
     return new LayoutBuilder(
         builder: (BuildContext context, BoxConstraints viewportConstraints) {
           print(viewportConstraints.maxHeight);
-          return SingleChildScrollView(
-            child:Column(
-              children: <Widget>[
-//                _getBaseTopBar(),
-                _getBaseAppBar(),
-                Container(
-                  width: getScreenWidth(),
-                  height: viewportConstraints.maxHeight-getCutdownHeight(),
-                  color: Colors.red, //背景颜色，可自己变更
-                  child: Stack(
-                    children: <Widget>[
-                      buildWidget(context),
-                      _getBaseErrorWidget(),
-                      _getBaseEmptyWidget(),
-                      _getBassLoadingWidget(),
-                    ],
-                  ),
+          return Column(
+            children: <Widget>[
+              _getBaseAppBar(),//标题栏和状态栏
+              Container(
+                width: getScreenWidth(),
+                height: viewportConstraints.maxHeight-getCutdownHeight(),
+//                  color: Colors.red, //背景颜色，可自己变更
+                child: Stack(
+                  children: <Widget>[
+                    buildWidget(context),
+//                      _getBaseErrorWidget(),
+//                      _getBaseEmptyWidget(),
+//                      _getBassLoadingWidget(),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           );
         }
         );
   }
 
-  Widget _getBaseTopBar() {
-    return Offstage(
-      offstage: !_isTopBarShow,
-      child: getTopBar(),
-    );
-  }
-
+  //绘制标题栏
   Widget _getBaseAppBar() {
     if(_isTopBarShow && _isAppBarShow == false) { //如果隐藏标题不隐藏状态栏返回状态栏
         return Container(
           height: getTopBarHeight(),
           width: double.infinity,
-          color: _topBarColor,
+          color: Theme.of(_baseContext).primaryColor,
         );
     }else if(_isTopBarShow == false && _isAppBarShow == false){ //如果标题和状态栏都隐藏返回空 用
           return Container();
     }else {
      return GradientAppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
-          gradientStart: Color(0xFF2171F5),  //渐变使用开始颜色
-          gradientEnd: Color(0xFF49A2FC),   //渐变使用结束颜色
-          backgroundColor: _appBarColor,
-          actions:_appBarActions,
-          title: Text(_appBarTitle),
+          gradientStart: _gradientStart,  //渐变使用开始颜色
+          gradientEnd: _gradientEnd,   //渐变使用结束颜色
+          actions: _appBarActions,
+          title:_getTitle(),
           centerTitle: true,
-          leading: IconButton(
-            icon: Icon(YuiIcons.jiantou2),
-            onPressed: clickAppBarBack,
-          ),
+          leading:getLeading(),
       );
     }
   }
 
-  // 返回每个隐藏的菜单项
-  SelectView(IconData icon, String text, String id) {
-    return new PopupMenuItem<String>(
-        value: id,
-        child: new Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            new Icon(icon, color: Colors.blue),
-            new Text(text),
-          ],
-        )
-    );
+  //获取中间控件
+  Widget _getTitle(){
+    print("_getTitle");
+    if (_title is String) {
+      return Text(_title);
+    }else if(_title != null){
+      return _title;
+    }else {
+      return Text(getClassName());
+    }
+  }
+
+  //标题栏左边控件
+  Widget getLeading(){
+    if(_isBackIconShow&&_leading==null) //显示返回键
+      {
+          return  IconButton(
+            icon: Icon(YuiIcons.jiantou2),
+            onPressed: clickAppBarBack,
+          );
+      }else if(_leading!=null) //显示leading
+        {
+          return _leading;
+        }else{
+         return Container(); //什么都不显示
+    }
   }
 
 
-  ///设置状态栏，可以自行重写拓展成其他的任何形式
-  Widget getTopBar() {
-    return Container(
-      height: getTopBarHeight(),
-      width: double.infinity,
-      color: _topBarColor,
-    );
-  }
 
   ///暴露的错误页面方法，可以自己重写定制
   Widget getErrorWidget() {
@@ -207,7 +187,7 @@ abstract class BaseFuntion {
               strokeWidth: 4.0,
               backgroundColor: Colors.blue,
               // value: 0.2,
-              valueColor: new AlwaysStoppedAnimation<Color>(_appBarColor),
+              valueColor: new AlwaysStoppedAnimation<Color>(Theme.of(_baseContext).primaryColor),
             ),
         Offstage(
           offstage: _LoadingWidgetContent == "" ? true  : false,
@@ -222,43 +202,29 @@ abstract class BaseFuntion {
             ),
           ),
         )
-
         ],
       )
     );
   }
 
-  Color getAppBarColor(){
-    return _appBarColor;
-  }
-
-
   void clickAppBarBack() {
-    if (Navigator.canPop(_contextBaseFunction)) {
-      Navigator.pop(_contextBaseFunction);
+    if (Navigator.canPop(_baseContext)) {
+      Navigator.pop(_baseContext);
     } else {
       //说明已经没法回退了 ， 可以关闭了
       finishDartPageOrApp();
     }
   }
-//
-//
-//  defaultRouteName → String 启动应用程序时嵌入器请求的路由或路径。
-//  devicePixelRatio → double 每个逻辑像素的设备像素数。 例如，Nexus 6的设备像素比为3.5。
-//  textScaleFactor → double 系统设置的文本比例。默认1.0
-//  toString（） → String 返回此对象的字符串表示形式。
-//  physicalSize → Size 返回一个包含屏幕宽高的对象，单位是dp
-//
-//
+
 
   ///返回屏幕高度
   double getScreenHeight() {
-    return MediaQuery.of(_contextBaseFunction).size.height;
+    return MediaQuery.of(_baseContext).size.height;
   }
 
   ///返回状态栏高度
   double getTopBarHeight() {
-    return MediaQuery.of(_contextBaseFunction).padding.top;
+    return MediaQuery.of(_baseContext).padding.top;
   }
 
   ///返回appbar高度，也就是导航栏高度
@@ -273,7 +239,7 @@ abstract class BaseFuntion {
 
   ///返回屏幕宽度
   double getScreenWidth() {
-    return MediaQuery.of(_contextBaseFunction).size.width;
+    return MediaQuery.of(_baseContext).size.width;
   }
 
   //错误页显示
@@ -360,13 +326,11 @@ abstract class BaseFuntion {
     });
   }
 
-  void setAppBarTitle(String title) {
-    if (title != null) {
+  void setAppBarTitle(dynamic title) {
       // ignore: invalid_use_of_protected_member
       _stateBaseFunction.setState(() {
-        _appBarTitle = title;
+        _title = title;
       });
-    }
   }
 
   ///设置错误提示信息
@@ -462,7 +426,7 @@ abstract class BaseFuntion {
         Function rightfunc,
         bool isDismissible = true,
   }) {
-    if (_contextBaseFunction != null) {
+    if (_baseContext != null) {
       if (message != null && message.isNotEmpty) {
 //        showDialog<Null>(
 //            context: _contextBaseFunction, //BuildContext对象
@@ -482,14 +446,14 @@ abstract class BaseFuntion {
         if(isDismissible)
           {
             showDialog(
-              context: _contextBaseFunction,
-              builder: (_) => _generateAlertDialog(_contextBaseFunction,message,title: title,
+              context: _baseContext,
+              builder: (_) => _generateAlertDialog(_baseContext,message,title: title,
               leftbtn: leftbtn,leftbtnfunc: leftfunc,rightbtn: rightbtn,rightbtnfunc: rightfunc),
             );
           }else{
           showGeneralDialog(
-            context: _contextBaseFunction,
-            pageBuilder: (context, a, b) => _generateAlertDialog(_contextBaseFunction,message,title: title,
+            context: _baseContext,
+            pageBuilder: (context, a, b) => _generateAlertDialog(_baseContext,message,title: title,
                 leftbtn: leftbtn,leftbtnfunc: leftfunc,rightbtn: rightbtn,rightbtnfunc: rightfunc),
             barrierDismissible: false,
 //            barrierLabel: 'barrierLabel',
@@ -512,12 +476,12 @@ abstract class BaseFuntion {
     if(isDismissible)
     {
       showDialog(
-        context: _contextBaseFunction, builder: (_) => _generateAlertDialog(_contextBaseFunction,message,title: title,leftbtn:"取消",rightbtn:"确定",leftbtnfunc: leftfunc,rightbtnfunc: rightfunc),
+        context: _baseContext, builder: (_) => _generateAlertDialog(_baseContext,message,title: title,leftbtn:"取消",rightbtn:"确定",leftbtnfunc: leftfunc,rightbtnfunc: rightfunc),
       );
     }else{
       showGeneralDialog(
-        context: _contextBaseFunction,
-        pageBuilder: (context, a, b) => _generateAlertDialog(_contextBaseFunction,message,title: title,leftbtn:"取消",rightbtn:"确定",leftbtnfunc: leftfunc,rightbtnfunc: rightfunc),
+        context: _baseContext,
+        pageBuilder: (context, a, b) => _generateAlertDialog(_baseContext,message,title: title,leftbtn:"取消",rightbtn:"确定",leftbtnfunc: leftfunc,rightbtnfunc: rightfunc),
         barrierDismissible: false,
 //            barrierLabel: 'barrierLabel',
         transitionDuration: Duration(milliseconds: 400),
@@ -609,10 +573,10 @@ abstract class BaseFuntion {
 
 
   String getClassName() {
-    if (_contextBaseFunction == null) {
+    if (_baseContext == null) {
       return null;
     }
-    String className = _contextBaseFunction.toString();
+    String className = _baseContext.toString();
     if (className == null) {
       return null;
     }
@@ -635,7 +599,7 @@ abstract class BaseFuntion {
 
   ///弹吐司
   void showToast(String content){
-    YuiToast.info(_contextBaseFunction)(content);
+    YuiToast.info(_baseContext)(content);
   }
 
 

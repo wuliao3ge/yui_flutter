@@ -17,6 +17,8 @@ class YuiTheme with ChangeNotifier{
   Color primaryColor;
   // 主色禁用
   Color primaryColorDisabled;
+  //文字默认色
+  Color primaryTextColor;
   // 警告色
   Color warnColor;
   // 警告色禁用
@@ -27,8 +29,6 @@ class YuiTheme with ChangeNotifier{
   Color defaultBorderColor;
   // 遮罩层颜色
   Color maskColor;
-  //文字颜色
-  Color primaryTextColor;
   //窗口背景色
   Color backGroundColor;
 

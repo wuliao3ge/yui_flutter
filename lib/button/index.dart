@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:yui_flutter/animation/rotating.dart';
-import 'package:yui_flutter/store/index.dart';
-import 'package:yui_flutter/theme/index.dart';
-import '../icons/index.dart';
+import 'package:yui_flutter/icons/index.dart';
+
+import 'nosplashfactory.dart';
+
 
 // 颜色类型
 enum YuiButtonType {
@@ -18,27 +19,27 @@ enum YuiButtonSize {
 }
 
 class YuiButton extends StatefulWidget {
-  // 内容
-  dynamic child;
-  // 禁用
-  final bool disabled;
-  // 点击回调
-  final Function onClick;
-  // loading
-  final bool loading;
-  // 空心
-  final bool hollow;
-  // 按钮大小类型
-  YuiButtonSize sizeType;
-  // 按钮大小
-  Map<String, double> size;
-  // 主题
-  final YuiButtonType type;
-  //按钮中图标的颜色
-  final Color iconColor;
+   // 内容 文字或其他widget
+   dynamic child;
+   Color color;
+   // 禁用
+   final bool disabled;
+   // 点击回调
+   final Function onClick;
+   // loading
+   final bool loading;
+   // 空心
+   final bool hollow;
+   // 按钮大小类型
+   YuiButtonSize sizeType;
+   // 按钮大小
+   Map<String, double> size;
+   // 主题
+   final YuiButtonType type;
+   //按钮中图标的颜色
+   final Color iconColor;
 
-  final double radius;
-
+   final double radius;
 
   // 大小配置
   final List<Map<String, double>> sizeConfig = [
@@ -56,27 +57,33 @@ class YuiButton extends StatefulWidget {
     }
   ];
 
-  YuiButton(
-      this.child,
-      {
-        this.onClick,
-        YuiButtonSize size = YuiButtonSize.acquiescent,
-        this.hollow = false,
-        this.type = YuiButtonType.acquiescent,
-        this.disabled = false,
-        this.loading = false,
-        this.iconColor = Colors.black45,
-        this.radius = 5
-      }
-      ) {
-    this.size = sizeConfig[size.index];
-    this.sizeType = size;
-  }
+
+
+   YuiButton(
+       this.child,
+       {
+         this.onClick,
+         YuiButtonSize size = YuiButtonSize.acquiescent,
+         this.hollow = false,
+         this.type = YuiButtonType.acquiescent,
+         this.disabled = false,
+         this.loading = false,
+         this.iconColor = Colors.black45,
+         this.radius = 5
+       }
+       ) {
+     this.size = sizeConfig[size.index];
+     this.sizeType = size;
+   }
+
+
 
   @override
-  _ButtonState createState() => _ButtonState();
+  _YuiButtonState createState() => _YuiButtonState();
 }
-class _ButtonState extends State<YuiButton> {
+
+class _YuiButtonState extends State<YuiButton> {
+
 
   // 按钮点击
   onClick() {
@@ -100,16 +107,12 @@ class _ButtonState extends State<YuiButton> {
 
     // 内容
     List<Widget> children = [
-    YuiView.connect<YuiTheme>(builder: (context, child1, model) {
-      return DefaultTextStyle(
+      DefaultTextStyle(
           style: TextStyle(
               fontSize: size['fontSize'],
-              color: model.primaryTextColor
           ),
           child: child
-      );
-    })
-
+      )
     ];
 
     if (widget.loading) {
@@ -141,51 +144,36 @@ class _ButtonState extends State<YuiButton> {
     // 是否禁用状态
     final bool disabled = widget.loading || widget.disabled;
     // 圆角
-    final BorderRadius borderRadius = BorderRadius.all(Radius.circular(widget.radius));
+    final BorderRadius borderRadius = BorderRadius.all(Radius.circular(4));
+    // 按钮
+    final Widget button = Container(
+        height: size['height'],
+        padding: EdgeInsets.only(left: 10, right: 10),
+        decoration: BoxDecoration(
+            color: disabled ? Theme.of(context).disabledColor : null,
+            borderRadius: borderRadius,
+            // 空心或者默认按钮才添加边框
+            border: widget.hollow ? Border.all(
+                width: size['borderSize'],
+                color: Theme.of(context).dividerColor
+            ) : null
+        ),
+        child: renderChild(widget.child)
+    );
 
     // 禁用状态
     if (disabled) {
-      return YuiView.connect<YuiTheme>(builder: (context, child, model) {
-        return Container(
-            height: size['height'],
-            padding: EdgeInsets.only(left: 10, right: 10),
-            decoration: BoxDecoration(
-            color: disabled ? model.primaryColorDisabled : null,
-                borderRadius: borderRadius,
-                // 空心或者默认按钮才添加边框
-                border: widget.hollow ? Border.all(
-                    width: size['borderSize'],
-                    color: model.borderColor
-                ) : null
-            ),
-            child: renderChild(widget.child)
-        );
-      });
+      return button;
     }
 
-    return YuiView.connect<YuiTheme>(builder: (context, child, model) {
-        return Material(
+    return Material(
+        borderRadius: borderRadius,
+        color: Theme.of(context).primaryColor,
+        child: InkWell(
+            onTap: onClick,
             borderRadius: borderRadius,
-            color: model.primaryColor,
-            child: InkWell(
-                onTap: onClick,
-                borderRadius: borderRadius,
-                child: Container(
-                    height: size['height'],
-                    padding: EdgeInsets.only(left: 10, right: 10),
-                    decoration: BoxDecoration(
-                        borderRadius: borderRadius,
-                        // 空心或者默认按钮才添加边框
-                        border: widget.hollow ? Border.all(
-                            width: size['borderSize'],
-                            color: model.borderColor
-                        ) : null
-                    ),
-                    child: renderChild(widget.child)
-                )
-            )
-        );
-    });
+            child: button
+        )
+    );
   }
 }
-

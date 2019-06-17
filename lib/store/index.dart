@@ -23,13 +23,9 @@ class YuiView  {
         if(yuitheme==null) {
             providers
               ..provide(Provider.value(new YuiTheme()));
-            providers
-              ..provide(Provider.value(new YuiConfig()));
           }else if(yuitheme!=null){
             providers
                   ..provide(Provider.value(yuitheme as YuiTheme));
-            providers
-              ..provide(Provider.value(yuiconfig as YuiConfig));
             }
         return ProviderNode(
           child: child,
@@ -40,13 +36,9 @@ class YuiView  {
           if(yuitheme==null) {
             providers
               ..provide(Provider.value(new YuiTheme()));
-            providers
-              ..provide(Provider.value(new YuiConfig()));
           }else if(yuitheme!=null){
             providers
               ..provide(Provider.value(yuitheme as YuiTheme));
-            providers
-              ..provide(Provider.value(yuiconfig as YuiConfig));
           }
           return ProviderNode(
             child: child,

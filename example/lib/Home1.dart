@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provide/provide.dart';
 import 'package:yui_flutter/button/index.dart';
 import 'package:yui_flutter/toast/index.dart';
 
@@ -22,7 +23,7 @@ class _HomePageState extends State<HomePage> {
               onClick: (){
                 YuiToast.info(context)('测试');
               },
-              loading: isLoading,
+//              loading: isLoading,
             )
           ],
         ),

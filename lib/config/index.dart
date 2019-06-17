@@ -28,7 +28,7 @@ class YuiConfig {
     // 初始化
     toastInfoAlign = WeToastInfoAlign.center;
     toastInfoDuration = 2500;
-//    toastLoadingDuration
+    toastLoadingDuration = 2500;
     toastSuccessDuration = 2500;
     toastFailDuration = 2500;
     notifyDuration = 3000;
